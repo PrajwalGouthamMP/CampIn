@@ -18,10 +18,9 @@ app.set('views', path.join(__dirname, 'views'))
 app.get('/', (req, res) => {
     res.render('home.ejs')
 })
-app.get('/makecampground', async (req, res) => {
-    const newCamp = new campModel({ title: "My Backyard", description: "Cheap camping" })
-    await newCamp.save();
-    res.send(newCamp)
+app.get('/campgrounds', async (req, res) => {
+    const camps = await campModel.find({})
+    res.render('campgrounds/allcampg.ejs', { camps })
 })
 app.listen(3000, () => {
     console.log("Listening on port 3000")

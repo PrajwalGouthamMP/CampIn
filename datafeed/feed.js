@@ -21,7 +21,7 @@ const seedtodb = async () => {
         const place = `${cities[num].city} , ${cities[num].state}`
         const newCamp = new campModel({
             location: place,
-            description: title
+            title: title
         })
         await newCamp.save()
     }
