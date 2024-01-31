@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const path = require('path')
 const campModel = require('./models/campground')
+const methodOverride = require('method-override')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
     .then(() => {
         console.log("Connection successfull !!")
@@ -15,6 +16,7 @@ const app = express()
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }))
+app.use(methodOverride('_method'))
 app.get('/', (req, res) => {
     res.render('home.ejs')
 })
@@ -34,6 +36,16 @@ app.get('/campgrounds/:id', async (req, res) => {
     const { id } = req.params
     const campground = await campModel.findById(id)
     res.render('campgrounds/singlecamp.ejs', { campground })
+})
+app.put('/campgrounds/:id', async (req, res) => {
+    const { id } = req.params
+    await campModel.findByIdAndUpdate(id, req.body.campground)
+    res.redirect(`/campgrounds/${id}`)
+})
+app.get('/campgrounds/:id/edit', async (req, res) => {
+    const { id } = req.params
+    const campground = await campModel.findById(id)
+    res.render("campgrounds/editcamp.ejs", { campground })
 })
 app.listen(3000, () => {
     console.log("Listening on port 3000")
