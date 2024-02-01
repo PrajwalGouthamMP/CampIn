@@ -1,15 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= campground.title %>
-    </title>
-</head>
-
-<body>
+<% layout('/layouts/boilerplate') %>
     <h1>CampGround <%= campground.title %> Details : %></h1>
     <h3>
         <%= campground.location %>
@@ -26,6 +15,3 @@
         </form>
 
     </footer>
-</body>
-
-</html>
