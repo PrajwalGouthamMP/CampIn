@@ -19,9 +19,13 @@ const seedtodb = async () => {
         const title = `${descriptors[randomnumbergen(descriptors)]}  ${places[randomnumbergen(places)]}`
         const num = randomnumbergen(cities)
         const place = `${cities[num].city} , ${cities[num].state}`
+        const price = Math.floor(Math.random() * 50) + 10;
         const newCamp = new campModel({
             location: place,
-            title: title
+            title: title,
+            image: "https://source.unsplash.com/collection/483251",
+            description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum temporibus totam quibusdam adipisci vero ad architecto harum tenetur consectetur dolores. Ad ducimus exercitationem illum officia unde aliquid soluta doloribus fuga.",
+            price: price
         })
         await newCamp.save()
     }
