@@ -24,10 +24,10 @@ app.engine('ejs', ejsMate)
 app.get('/', (req, res) => {
     res.render('home.ejs')
 })
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', wrapAsync(async (req, res) => {
     const camps = await campModel.find({})
     res.render('campgrounds/allcampg.ejs', { camps })
-})
+}))
 app.post('/campgrounds', wrapAsync(async (req, res, next) => {
     if (!req.body.campground) {
         throw new ExpressError(400, 'Invalid CampGround Data')
@@ -65,7 +65,7 @@ app.all('*', (req, res, next) => {
 })
 app.use((err, req, res, next) => {
     const { status = 500, message = "Something went wrong !! " } = err
-    res.status(status).send(message)
+    res.status(status).render('error.ejs', { err })
 })
 app.listen(3000, () => {
     console.log("Listening on port 3000")
