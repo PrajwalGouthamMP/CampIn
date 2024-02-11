@@ -29,7 +29,9 @@ app.get('/campgrounds', async (req, res) => {
     res.render('campgrounds/allcampg.ejs', { camps })
 })
 app.post('/campgrounds', wrapAsync(async (req, res, next) => {
-
+    if (!req.body.campground) {
+        throw new ExpressError(400, 'Invalid CampGround Data')
+    }
     const campground = new campModel(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground._id}`)
@@ -58,8 +60,12 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
     const campground = await campModel.findById(id)
     res.render("campgrounds/editcamp.ejs", { campground })
 }))
+app.all('*', (req, res, next) => {
+    next(new ExpressError(404, 'We do not serve here !!'))
+})
 app.use((err, req, res, next) => {
-    res.send("Oh Buy ,Something went wrong !!")
+    const { status = 500, message = "Something went wrong !! " } = err
+    res.status(status).send(message)
 })
 app.listen(3000, () => {
     console.log("Listening on port 3000")
