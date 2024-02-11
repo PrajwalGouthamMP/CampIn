@@ -26,10 +26,15 @@ app.get('/campgrounds', async (req, res) => {
     const camps = await campModel.find({})
     res.render('campgrounds/allcampg.ejs', { camps })
 })
-app.post('/campgrounds', async (req, res) => {
-    const campground = new campModel(req.body.campground)
-    await campground.save()
-    res.redirect(`/campgrounds/${campground._id}`)
+app.post('/campgrounds', async (req, res, next) => {
+    try {
+        const campground = new campModel(req.body.campground)
+        await campground.save()
+        res.redirect(`/campgrounds/${campground._id}`)
+    }
+    catch (e) {
+        next(e)
+    }
 })
 app.get('/campgrounds/new', (req, res) => {
     res.render("campgrounds/newcamp.ejs")
@@ -53,6 +58,9 @@ app.get('/campgrounds/:id/edit', async (req, res) => {
     const { id } = req.params
     const campground = await campModel.findById(id)
     res.render("campgrounds/editcamp.ejs", { campground })
+})
+app.use((err, req, res, next) => {
+    res.send("Oh Buy ,Something went wrong !!")
 })
 app.listen(3000, () => {
     console.log("Listening on port 3000")
