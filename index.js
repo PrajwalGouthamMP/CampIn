@@ -6,6 +6,7 @@ const wrapAsync = require('./utils/wrapAsync')
 const ExpressError = require('./utils/ExpressError')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
+const joi = require('joi')
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
     .then(() => {
         console.log("Connection successfull !!")
@@ -29,8 +30,21 @@ app.get('/campgrounds', wrapAsync(async (req, res) => {
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
 app.post('/campgrounds', wrapAsync(async (req, res, next) => {
-    if (!req.body.campground) {
-        throw new ExpressError(400, 'Invalid CampGround Data')
+    const joiSchema = joi.object({
+        campground: joi.object({
+            title: joi.string().required(),
+            price: joi.number().required().min(0),
+            image: joi.string().required(),
+            desciption: joi.string().required(),
+            location: joi.string().required()
+        }).required()
+    })
+    const { error } = joiSchema.validate(req.body)
+
+
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(400, msg)
     }
     const campground = new campModel(req.body.campground)
     await campground.save()
