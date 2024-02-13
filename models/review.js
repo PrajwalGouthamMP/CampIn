@@ -4,5 +4,5 @@ const reviewSchema = new mngs.Schema({
     body: String,
     rating: Number
 })
-const Review = mngs.model('Riview', reviewSchema)
+const Review = mngs.model('Review', reviewSchema)
 module.exports = Review

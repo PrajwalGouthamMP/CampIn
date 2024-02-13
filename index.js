@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const path = require('path')
 const campModel = require('./models/campground')
+const reviewModel = require('./models/review')
 const wrapAsync = require('./utils/wrapAsync')
 const ExpressError = require('./utils/ExpressError')
 const joiSchema = require('./joischema')
@@ -82,6 +83,22 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
     const campground = await campModel.findById(id)
     res.render("campgrounds/editcamp.ejs", { campground })
 }))
+
+app.post('/campgrounds/:id/reviews', wrapAsync(
+    async (req, res) => {
+        const { id } = req.params
+        const review = req.body.review
+        const newrev = new reviewModel(review)
+        await newrev.save()
+        const campground = await campModel.findById(id)
+        campground.reviews.push(newrev)
+        await campground.save()
+        console.log(campground)
+        res.redirect(`/campgrounds/${id}`)
+
+
+    }
+))
 app.all('*', (req, res, next) => {
     next(new ExpressError(404, 'We do not serve here !!'))
 })
