@@ -104,6 +104,8 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
     res.render("campgrounds/editcamp.ejs", { campground })
 }))
 
+
+
 app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(
     async (req, res) => {
         const { id } = req.params
@@ -113,6 +115,15 @@ app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(
         const campground = await campModel.findById(id)
         campground.reviews.push(newrev)
         await campground.save()
+        res.redirect(`/campgrounds/${id}`)
+
+    }
+))
+app.delete('/campgrounds/:id/reviews/:reviewId', wrapAsync(
+    async (req, res) => {
+        const { id, reviewId } = req.params
+        await campModel.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
+        await reviewModel.findByIdAndDelete(reviewId)
         res.redirect(`/campgrounds/${id}`)
 
     }

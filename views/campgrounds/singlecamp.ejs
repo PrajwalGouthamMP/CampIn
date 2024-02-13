@@ -1,6 +1,6 @@
 <% layout('/layouts/boilerplate') %>
     <div class="row">
-        <div class="col-6 offset-3">
+        <div class="col-6">
             <div class="card mb-5">
                 <img src="<%= campground.image %>" alt=""></img>
                 <div class="card-body">
@@ -29,6 +29,9 @@
                     <a href="/campgrounds">All CampGround</a>
                 </div>
             </div>
+        </div>
+        <div class="col-6">
+            <h2>Add Your Review</h2>
             <form class="mb-3 validated-form" action="/campgrounds/<%=campground._id%>/reviews" method="post"
                 novalidate>
                 <div class="mb-3">
@@ -37,7 +40,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="body">Review : </label>
-                    <textarea name="review[body]" id="body" cols="30" rows="5" class="form-control" required></textarea>
+                    <textarea name="review[body]" id="body" cols="30" rows="3" class="form-control" required></textarea>
                     <div class="valid-feedback">
                         Looks Good !
                     </div>
@@ -45,18 +48,23 @@
                 <button class="btn btn-success">Submit</button>
             </form>
             <h3>Reviews : </h3>
-            <div class="mb-3">
 
-                <% for (let review of campground.reviews){ %>
-                    <div>
+            <% for (let review of campground.reviews){ %>
+                <div class="card mb-3 ">
+                    <div class="card-body">
                         <p>Reviews: <%= review.body %>
                         </p>
                         <p>Rating : <%= review.rating %>
                         </p>
+                        <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
+                            method="post">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
                     </div>
-                    <% } %>
-            </div>
+                </div>
+                <% } %>
         </div>
+
     </div>
 
 
