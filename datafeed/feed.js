@@ -29,7 +29,6 @@ const seedtodb = async () => {
         })
         await newCamp.save()
     }
-    console.log((await campModel.find({})).length)
 }
 seedtodb().then(() => {
     mongoose.connection.close()
