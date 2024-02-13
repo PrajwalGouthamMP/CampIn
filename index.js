@@ -85,7 +85,7 @@ app.get('/campgrounds/new', (req, res) => {
 })
 app.get('/campgrounds/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
-    const campground = await campModel.findById(id)
+    const campground = await campModel.findById(id).populate('reviews')
     res.render('campgrounds/singlecamp.ejs', { campground })
 }))
 app.put('/campgrounds/:id', validateCampground, wrapAsync(async (req, res) => {
