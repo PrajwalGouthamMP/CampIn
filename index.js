@@ -5,7 +5,7 @@ const campModel = require('./models/campground')
 const reviewModel = require('./models/review')
 const wrapAsync = require('./utils/wrapAsync')
 const ExpressError = require('./utils/ExpressError')
-const joiSchema = require('./joischema')
+const { joiSchema, reviewSchema } = require('./joischema')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
 const joi = require('joi')
@@ -40,6 +40,26 @@ const validateCampground = (req, res, next) => {
     //     }).required()
     // })
     const { error } = joiSchema.validate(req.body)
+
+
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(400, msg)
+    } else {
+        next()
+    }
+}
+const validateReview = (req, res, next) => {
+    // const joiSchema = joi.object({
+    //     campground: joi.object({
+    //         title: joi.string().required(),
+    //         price: joi.number().required().min(0),
+    //         image: joi.string().required(),
+    //         desciption: joi.string().required(),
+    //         location: joi.string().required()
+    //     }).required()
+    // })
+    const { error } = reviewSchema.validate(req.body)
 
 
     if (error) {
@@ -84,7 +104,7 @@ app.get('/campgrounds/:id/edit', wrapAsync(async (req, res) => {
     res.render("campgrounds/editcamp.ejs", { campground })
 }))
 
-app.post('/campgrounds/:id/reviews', wrapAsync(
+app.post('/campgrounds/:id/reviews', validateReview, wrapAsync(
     async (req, res) => {
         const { id } = req.params
         const review = req.body.review
@@ -93,9 +113,7 @@ app.post('/campgrounds/:id/reviews', wrapAsync(
         const campground = await campModel.findById(id)
         campground.reviews.push(newrev)
         await campground.save()
-        console.log(campground)
         res.redirect(`/campgrounds/${id}`)
-
 
     }
 ))
