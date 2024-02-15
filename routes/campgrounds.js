@@ -4,6 +4,7 @@ const campModel = require('../models/campground')
 const wrapAsync = require('../utils/wrapAsync')
 const ExpressError = require('../utils/ExpressError')
 const { joiSchema } = require('../joischema')
+
 const validateCampground = (req, res, next) => {
     const { error } = joiSchema.validate(req.body)
 
@@ -21,9 +22,10 @@ route.get('/', wrapAsync(async (req, res) => {
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
 route.post('/', validateCampground, wrapAsync(async (req, res, next) => {
-    console.log(req.body)
+
     const campground = new campModel(req.body.campground)
     await campground.save()
+    req.flash('success', 'Succesfully created a new Campground')
     res.redirect(`/campgrounds/${campground._id}`)
 
 }))

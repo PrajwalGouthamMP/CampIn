@@ -7,6 +7,7 @@ const ejsMate = require('ejs-mate')
 const campgroundsRoute = require('./routes/campgrounds')
 const reviewsRoute = require('./routes/reviews')
 const session = require('express-session')
+const flash = require('connect-flash')
 
 mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
     .then(() => {
@@ -34,6 +35,11 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(session(sessionConfig))
+app.use(flash())
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success')
+    next()
+})
 
 app.engine('ejs', ejsMate)
 app.get('/', (req, res) => {
