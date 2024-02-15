@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/campgrounds', campgroundsRoute)
 app.use('/campgrounds/:id/reviews', reviewsRoute)
+app.use(express.static(path.join(__dirname, '/statics')))
 
 app.all('*', (req, res, next) => {
     next(new ExpressError(404, 'We do not serve here !!'))
