@@ -22,7 +22,6 @@ route.get('/', wrapAsync(async (req, res) => {
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
 route.post('/', validateCampground, wrapAsync(async (req, res, next) => {
-
     const campground = new campModel(req.body.campground)
     await campground.save()
     req.flash('success', 'Succesfully created a new Campground')
@@ -35,11 +34,16 @@ route.get('/new', (req, res) => {
 route.get('/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
     const campground = await campModel.findById(id).populate('reviews')
+    if (!campground) {
+        req.flash('error', 'Cannot Find such Campground')
+        return res.redirect('/campgrounds')
+    }
     res.render('campgrounds/singlecamp.ejs', { campground })
 }))
 route.put('/:id', validateCampground, wrapAsync(async (req, res) => {
     const { id } = req.params
     await campModel.findByIdAndUpdate(id, req.body.campground)
+    req.flash('success', 'Succesfully updated a new Campground')
     res.redirect(`/campgrounds/${id}`)
 }))
 route.delete('/:id', wrapAsync(async (req, res) => {
@@ -50,6 +54,10 @@ route.delete('/:id', wrapAsync(async (req, res) => {
 route.get('/:id/edit', wrapAsync(async (req, res) => {
     const { id } = req.params
     const campground = await campModel.findById(id)
+    if (!campground) {
+        req.flash('error', 'Cannot Find such Campground')
+        return res.redirect('/campgrounds')
+    }
     res.render("campgrounds/editcamp.ejs", { campground })
 }))
 module.exports = route
