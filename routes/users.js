@@ -1,11 +1,12 @@
 const express = require('express')
 const userModel = require('../models/user')
 const wrapAsync = require('../utils/wrapAsync')
+const passport = require('passport')
 const route = express.Router()
-route.get('/', (req, res) => {
+route.get('/register', (req, res) => {
     res.render('users/register.ejs')
 })
-route.post('/', wrapAsync(async (req, res) => {
+route.post('/register', wrapAsync(async (req, res) => {
     try {
         const { username, password, email } = req.body
         const newUser = new userModel({
@@ -22,4 +23,12 @@ route.post('/', wrapAsync(async (req, res) => {
     }
 
 }))
+route.get('/login', (req, res) => {
+    res.render('users/login.ejs')
+})
+route.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
+    req.flash('success', 'welcome to our campgrounds !')
+    res.redirect('/campgrounds')
+})
+
 module.exports = route

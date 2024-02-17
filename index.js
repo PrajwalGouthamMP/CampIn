@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
 
 app.use('/campgrounds', campgroundsRoute)
 app.use('/campgrounds/:id/reviews', reviewsRoute)
-app.use('/register', userRoute)
+app.use('/', userRoute)
 app.use(express.static(path.join(__dirname, '/statics')))
 
 app.all('*', (req, res, next) => {
