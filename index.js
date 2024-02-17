@@ -40,16 +40,19 @@ app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use(session(sessionConfig))
 app.use(flash())
-app.use((req, res, next) => {
-    res.locals.success = req.flash('success')
-    res.locals.error = req.flash('error')
-    next()
-})
+
 app.use(passport.initialize())
 app.use(passport.session())
 passport.use(new LocalStrategy(userModel.authenticate()))
 passport.serializeUser(userModel.serializeUser())
 passport.deserializeUser(userModel.deserializeUser())
+
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash('success')
+    res.locals.error = req.flash('error')
+    next()
+})
 
 app.engine('ejs', ejsMate)
 app.get('/', (req, res) => {
@@ -69,6 +72,8 @@ app.use('/campgrounds', campgroundsRoute)
 app.use('/campgrounds/:id/reviews', reviewsRoute)
 app.use('/', userRoute)
 app.use(express.static(path.join(__dirname, '/statics')))
+
+
 
 app.all('*', (req, res, next) => {
     next(new ExpressError(404, 'We do not serve here !!'))
