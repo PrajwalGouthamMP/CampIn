@@ -6,7 +6,7 @@ const route = express.Router()
 route.get('/register', (req, res) => {
     res.render('users/register.ejs')
 })
-route.post('/register', wrapAsync(async (req, res) => {
+route.post('/register', wrapAsync(async (req, res, next) => {
     try {
         const { username, password, email } = req.body
         const newUser = new userModel({
@@ -14,8 +14,16 @@ route.post('/register', wrapAsync(async (req, res) => {
             email: email
         })
         const registeredUser = await userModel.register(newUser, password)
-        req.flash('success', 'Welcome to our Campgrounds')
-        res.redirect('/campgrounds')
+        req.login(registeredUser, (err) => {
+            if (err) {
+                return next(err)
+            } else {
+                req.flash('success', 'Welcome to our Campgrounds')
+                res.redirect('/campgrounds')
+            }
+        })
+
+
     } catch (e) {
         req.flash('error', e.message)
         res.redirect('/register')
