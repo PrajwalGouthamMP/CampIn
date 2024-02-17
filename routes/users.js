@@ -2,6 +2,7 @@ const express = require('express')
 const userModel = require('../models/user')
 const wrapAsync = require('../utils/wrapAsync')
 const passport = require('passport')
+const { storeReturnTo } = require('../middleware')
 const route = express.Router()
 route.get('/register', (req, res) => {
     res.render('users/register.ejs')
@@ -34,9 +35,10 @@ route.post('/register', wrapAsync(async (req, res, next) => {
 route.get('/login', (req, res) => {
     res.render('users/login.ejs')
 })
-route.post('/login', passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
+route.post('/login', storeReturnTo, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), (req, res) => {
     req.flash('success', 'welcome to our campgrounds !')
-    res.redirect('/campgrounds')
+    const redirecturl = res.locals.returnTo || '/campgrounds'
+    res.redirect(redirecturl)
 })
 route.get('/logout', (req, res) => {
     req.logOut(function (err) {
