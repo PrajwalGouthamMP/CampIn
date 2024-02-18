@@ -19,7 +19,6 @@ const validateCampground = (req, res, next) => {
 }
 
 route.get('/', ensureLoggedIn, wrapAsync(async (req, res) => {
-    console.log(req.user)
     const camps = await campModel.find({})
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
