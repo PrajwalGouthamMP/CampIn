@@ -6,7 +6,7 @@ const { ensureLoggedIn } = require('../middleware')
 const { validateCampground, isAuthor } = require('../middleware')
 
 
-route.get('/', ensureLoggedIn, wrapAsync(async (req, res) => {
+route.get('/', wrapAsync(async (req, res) => {
     const camps = await campModel.find({})
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
@@ -21,9 +21,14 @@ route.post('/', ensureLoggedIn, validateCampground, wrapAsync(async (req, res, n
 route.get('/new', ensureLoggedIn, (req, res) => {
     res.render("campgrounds/newcamp.ejs")
 })
-route.get('/:id', ensureLoggedIn, wrapAsync(async (req, res) => {
+route.get('/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
-    const campground = await campModel.findById(id).populate('reviews').populate('author')
+    const campground = await campModel.findById(id).populate({
+        path: 'reviews',
+        populate: {
+            path: 'author'
+        }
+    }).populate('author')
     if (!campground) {
         req.flash('error', 'Cannot Find such Campground')
         return res.redirect('/campgrounds')

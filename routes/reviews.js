@@ -5,27 +5,18 @@ const ExpressError = require('../utils/ExpressError')
 const { reviewSchema } = require('../joischema')
 const reviewModel = require('../models/review')
 const campModel = require('../models/campground')
-
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body)
-
-
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(400, msg)
-    } else {
-        next()
-    }
-}
+const { validateReview, ensureLoggedIn, isReviewAuthor } = require('../middleware')
 
 
 
 
-route.post('/', validateReview, wrapAsync(
+
+route.post('/', ensureLoggedIn, validateReview, wrapAsync(
     async (req, res) => {
         const { id } = req.params
         const review = req.body.review
         const newrev = new reviewModel(review)
+        newrev.author = req.user._id
         await newrev.save()
         const campground = await campModel.findById(id)
         campground.reviews.push(newrev)
@@ -35,7 +26,7 @@ route.post('/', validateReview, wrapAsync(
 
     }
 ))
-route.delete('/:reviewId', wrapAsync(
+route.delete('/:reviewId', isReviewAuthor, wrapAsync(
     async (req, res) => {
         const { id, reviewId } = req.params
         await campModel.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })

@@ -1,6 +1,7 @@
 const ExpressError = require('./utils/ExpressError')
-const { joiSchema } = require('./joischema')
-const campModel = require('./models/campground')
+const { joiSchema, reviewSchema } = require('./joischema')
+const campModel = require('./models/campground');
+const Review = require('./models/review');
 
 module.exports.ensureLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -31,7 +32,7 @@ module.exports.validateCampground = (req, res, next) => {
 }
 module.exports.isAuthor = async (req, res, next) => {
     const { id } = req.params
-    const campground = await campModel.findById(id)
+    const campground = await campModel.findById(id).populate('author')
     if (!campground.author.equals(req.user._id)) {
         req.flash('error', 'Only author can perform this operation')
         return res.redirect(`/campgrounds/${id}`)
@@ -40,4 +41,27 @@ module.exports.isAuthor = async (req, res, next) => {
         next()
     }
 
+}
+module.exports.isReviewAuthor = async (req, res, next) => {
+    const { id, reviewId } = req.params
+    const review = await Review.findById(reviewId)
+    if (!review.author.equals(req.user._id)) {
+        req.flash('error', 'Only author can perform this operation')
+        return res.redirect(`/campgrounds/${id}`)
+    }
+    else {
+        next()
+    }
+
+}
+module.exports.validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body)
+
+
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(400, msg)
+    } else {
+        next()
+    }
 }
