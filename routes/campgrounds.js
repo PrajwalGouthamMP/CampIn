@@ -19,12 +19,14 @@ const validateCampground = (req, res, next) => {
 }
 
 route.get('/', ensureLoggedIn, wrapAsync(async (req, res) => {
-
+    console.log(req.user)
     const camps = await campModel.find({})
     res.render('campgrounds/allcampg.ejs', { camps })
 }))
 route.post('/', ensureLoggedIn, validateCampground, wrapAsync(async (req, res, next) => {
     const campground = new campModel(req.body.campground)
+    campground.author = req.user._id
+    console.log(campground)
     await campground.save()
     req.flash('success', 'Succesfully created a new Campground')
     res.redirect(`/campgrounds/${campground._id}`)
@@ -35,7 +37,7 @@ route.get('/new', ensureLoggedIn, (req, res) => {
 })
 route.get('/:id', ensureLoggedIn, wrapAsync(async (req, res) => {
     const { id } = req.params
-    const campground = await campModel.findById(id).populate('reviews')
+    const campground = await campModel.findById(id).populate('reviews').populate('author')
     if (!campground) {
         req.flash('error', 'Cannot Find such Campground')
         return res.redirect('/campgrounds')

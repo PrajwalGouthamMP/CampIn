@@ -12,7 +12,11 @@ const campSchema = new schema({
             type: schema.Types.ObjectId,
             ref: 'Review'
         }
-    ]
+    ],
+    author: {
+        type: schema.Types.ObjectId,
+        ref: 'User'
+    }
 })
 campSchema.post('findOneAndDelete', async (doc) => {
     if (doc) {
