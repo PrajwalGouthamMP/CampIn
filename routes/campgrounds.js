@@ -4,55 +4,20 @@ const campModel = require('../models/campground')
 const wrapAsync = require('../utils/wrapAsync')
 const { ensureLoggedIn } = require('../middleware')
 const { validateCampground, isAuthor } = require('../middleware')
+const campgroundController = require('../controllers/campground')
 
+route.get('/', wrapAsync(campgroundController.getallcampgrounds))
 
-route.get('/', wrapAsync(async (req, res) => {
-    const camps = await campModel.find({})
-    res.render('campgrounds/allcampg.ejs', { camps })
-}))
-route.post('/', ensureLoggedIn, validateCampground, wrapAsync(async (req, res, next) => {
-    const campground = new campModel(req.body.campground)
-    campground.author = req.user._id
-    await campground.save()
-    req.flash('success', 'Succesfully created a new Campground')
-    res.redirect(`/campgrounds/${campground._id}`)
+route.post('/', ensureLoggedIn, validateCampground, wrapAsync(campgroundController.postnewcampground))
 
-}))
-route.get('/new', ensureLoggedIn, (req, res) => {
-    res.render("campgrounds/newcamp.ejs")
-})
-route.get('/:id', wrapAsync(async (req, res) => {
-    const { id } = req.params
-    const campground = await campModel.findById(id).populate({
-        path: 'reviews',
-        populate: {
-            path: 'author'
-        }
-    }).populate('author')
-    if (!campground) {
-        req.flash('error', 'Cannot Find such Campground')
-        return res.redirect('/campgrounds')
-    }
-    res.render('campgrounds/singlecamp.ejs', { campground })
-}))
-route.put('/:id', ensureLoggedIn, isAuthor, validateCampground, wrapAsync(async (req, res) => {
-    const { id } = req.params
-    await campModel.findByIdAndUpdate(id, req.body.campground)
-    req.flash('success', 'Succesfully updated a new Campground')
-    res.redirect(`/campgrounds/${id}`)
-}))
-route.delete('/:id', ensureLoggedIn, isAuthor, wrapAsync(async (req, res) => {
-    const { id } = req.params
-    await campModel.findByIdAndDelete(id)
-    res.redirect('/campgrounds')
-}))
-route.get('/:id/edit', ensureLoggedIn, isAuthor, wrapAsync(async (req, res) => {
-    const { id } = req.params
-    const campground = await campModel.findById(id)
-    if (!campground) {
-        req.flash('error', 'Cannot Find such Campground')
-        return res.redirect('/campgrounds')
-    }
-    res.render("campgrounds/editcamp.ejs", { campground })
-}))
+route.get('/new', ensureLoggedIn, campgroundController.getnewcampgroundform)
+
+route.get('/:id', wrapAsync(campgroundController.getsinglecampground))
+
+route.put('/:id', ensureLoggedIn, isAuthor, validateCampground, wrapAsync(campgroundController.editcampground))
+
+route.delete('/:id', ensureLoggedIn, isAuthor, wrapAsync(campgroundController.deletecampground))
+
+route.get('/:id/edit', ensureLoggedIn, isAuthor, wrapAsync(campgroundController.geteditcampgroundform))
+
 module.exports = route

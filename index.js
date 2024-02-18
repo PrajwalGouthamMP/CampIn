@@ -17,7 +17,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/yelp-camp')
     .then(() => {
         console.log("Connection successfull !!")
     }).catch((err) => {
-        console.log("error ")
         console.log(err)
     })
 
