@@ -9,9 +9,7 @@ const { validateReview, ensureLoggedIn, isReviewAuthor } = require('../middlewar
 const reviewContoller = require('../controllers/review')
 
 
-
-
-
 route.post('/', ensureLoggedIn, validateReview, wrapAsync(reviewContoller.postnewreview))
+
 route.delete('/:reviewId', isReviewAuthor, wrapAsync(reviewContoller.deletereview))
 module.exports = route

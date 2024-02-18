@@ -6,13 +6,13 @@ const { storeReturnTo } = require('../middleware')
 const route = express.Router()
 const userController = require('../controllers/user')
 
-route.get('/register', userController.getregisterform)
+route.route('/register')
+    .get(userController.getregisterform)
+    .post(wrapAsync(userController.postnewuser))
 
-route.post('/register', wrapAsync(userController.postnewuser))
-
-route.get('/login', userController.getloginform)
-
-route.post('/login', storeReturnTo, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), userController.loginuser)
+route.route('/login')
+    .get(userController.getloginform)
+    .post(storeReturnTo, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), userController.loginuser)
 
 route.get('/logout', userController.logoutuser)
 module.exports = route
