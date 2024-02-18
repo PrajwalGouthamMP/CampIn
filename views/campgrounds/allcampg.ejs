@@ -1,6 +1,8 @@
 <% layout('/layouts/boilerplate') %>
     <h1>List of Campgrounds</h1>
-    <a href="/campgrounds/new">Add new CampGround</a>
+    <button class="btn btn-primary mb-3"><a href="/campgrounds/new"
+            class="text text-light link-offset-2 link-underline link-underline-opacity-0">Add New
+            CampGround</a></button>
     <ul>
         <% for(let camp of camps) { %>
             <!-- <li> <a href="campgrounds/<%= camp._id %>">
