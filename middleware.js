@@ -33,7 +33,7 @@ module.exports.validateCampground = (req, res, next) => {
 module.exports.isAuthor = async (req, res, next) => {
     const { id } = req.params
     const campground = await campModel.findById(id).populate('author')
-    if (!campground.author.equals(req.user._id)) {
+    if (req.user && !campground.author.equals(req.user._id)) {
         req.flash('error', 'Only author can perform this operation')
         return res.redirect(`/campgrounds/${id}`)
     }
